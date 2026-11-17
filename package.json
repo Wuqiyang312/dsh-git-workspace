@@ -43,7 +43,8 @@
     "icon.svg"
   ],
   "scripts": {
-    "test": "node --test --experimental-test-isolation=none \"tests/*.test.js\"",
+    "test": "node --test",
+    "test:no-isolation": "node --test --experimental-test-isolation=none",
     "check": "node --check index.js && node --check client.js && node --check src/parse.js && node --check src/clone.js"
   },
   "dsh": {

@@ -57,6 +57,10 @@ async function git(cwd, args) {
           'commit.gpgsign=false',
           '-c',
           'init.defaultBranch=main',
+          /* Store the fixture bytes as written: a Windows runner's global
+             `core.autocrlf=true` would otherwise rewrite them on add. */
+          '-c',
+          'core.autocrlf=false',
           ...args,
         ],
         {
@@ -84,6 +88,18 @@ async function git(cwd, args) {
 /** A fresh directory under the OS temp directory, named for this test. */
 function makeRoot(label) {
   return fs.mkdtemp(path.join(os.tmpdir(), `dsh-gw-${label}-`));
+}
+
+/**
+ * Read a checked-out file as text with LF newlines.
+ *
+ * A clone inherits the machine's `core.autocrlf`: GitHub's Windows runners set
+ * it to `true`, so the same commit checks out with CRLF there and LF elsewhere.
+ * The newline style is the runner's business, not this plugin's, so the
+ * assertions below compare content only.
+ */
+async function readNormalized(file) {
+  return (await fs.readFile(file, 'utf8')).replace(/\r\n/g, '\n');
 }
 
 /** A repository with exactly one commit on `main`. */
@@ -186,7 +202,7 @@ test('a successful clone lands at the exact destination', async (t) => {
   assert.equal(result.ok, true, result.ok === false ? result.error.message : '');
   assert.equal(result.value.path, path.join(parent, 'cloned'));
   assert.equal(result.value.folderName, 'cloned');
-  assert.equal(await fs.readFile(path.join(parent, 'cloned', 'README.md'), 'utf8'), '# fixture\n');
+  assert.equal(await readNormalized(path.join(parent, 'cloned', 'README.md')), '# fixture\n');
   assert.deepEqual(await stagingLeftovers(parent), []);
   /* The .git directory survived the rename: this is a real clone. */
   assert.ok((await fs.stat(path.join(parent, 'cloned', '.git'))).isDirectory());
@@ -212,7 +228,7 @@ test('a requested branch is checked out', async (t) => {
 
   assert.equal(result.ok, true, result.ok === false ? result.error.message : '');
   assert.equal(result.value.branch, 'demo-branch');
-  assert.equal(await fs.readFile(path.join(parent, 'onbranch', 'branch.txt'), 'utf8'), 'motor\n');
+  assert.equal(await readNormalized(path.join(parent, 'onbranch', 'branch.txt')), 'motor\n');
 });
 
 test('a target that already exists is refused and left untouched', async (t) => {
@@ -233,7 +249,7 @@ test('a target that already exists is refused and left untouched', async (t) => 
 
   assert.equal(result.ok, false);
   assert.equal(result.error.code, 'git-workspace/target-exists');
-  assert.equal(await fs.readFile(path.join(occupied, 'keep.txt'), 'utf8'), 'must survive\n');
+  assert.equal(await readNormalized(path.join(occupied, 'keep.txt')), 'must survive\n');
   assert.deepEqual(await stagingLeftovers(parent), []);
 });
 

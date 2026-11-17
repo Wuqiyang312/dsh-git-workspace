@@ -139,13 +139,15 @@ plugin_manager({ action: "install_bundle", target: "<...>/dsh-git-workspace" })
 ## 测试
 
 ```bash
-npm test
-# 等价于：node --test --experimental-test-isolation=none "tests/*.test.js"
+npm test          # 等价于 node --test（Node 20+ 自动发现 tests/*.test.js）
+npm run check     # 只做 node --check 语法检查
 ```
 
-`--experimental-test-isolation=none` 在 Windows + 受限沙箱里是必需的：默认的 per-file 子进程隔离会 `spawn` 一个带管道的子进程，而某些沙箱禁止命名管道（`spawn EPERM`）；`none` 让每个测试文件在同一个进程里跑。另外 `node --test tests/` 在 ESM 下不接受目录（`ERR_UNSUPPORTED_DIR_IMPORT`），所以用 glob。
+如果在受限沙箱里默认的 per-file 子进程隔离起不来（`spawn EPERM`——Windows 上带管道的子进程是一对命名管道，某些沙箱直接禁止），换用 `npm run test:no-isolation`：它在同一个进程里跑完所有文件，需要 Node 22+（`--experimental-test-isolation=none` 在 Node 20 上是 `bad option`）。
 
-测试**不联网、不碰用户仓库**：源仓库是在 `os.tmpdir()` 下用 `git init` + 一次提交现建的，克隆目标也在同一临时目录，测试结束自行清理。
+测试**不联网、不碰用户仓库**：源仓库是在 `os.tmpdir()` 下用 `git init` + 一次提交现建的，克隆目标也在同一临时目录，测试结束自行清理。断言里比较文件内容时会把 CRLF 归一成 LF——克隆会继承机器的 `core.autocrlf`，GitHub 的 Windows runner 上是 `true`，这是 runner 的事、不是插件的事。
+
+CI 在 `.github/workflows/test.yml`：ubuntu + windows × Node 20 + 22，跑 `npm run check` 和 `npm test`。
 
 ## 许可
 
