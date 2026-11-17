@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Git workspace",
+    "description": "Adds a button beside the New Session workspace picker that clones a Git repository and opens it as a workspace."
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "name": "@wuqiyang312/dsh-git-workspace",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "DSH plugin: turn any Git address into a workspace. Paste a repository URL, the Host clones it, registers it as a DeepSeek Harness workspace and opens a new session in it.",
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "deepseek",
+    "cordis",
+    "git",
+    "workspace",
+    "clone"
+  ],
+  "license": "MIT",
+  "author": "Wuqiyang312",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Wuqiyang312/dsh-git-workspace.git"
+  },
+  "homepage": "https://github.com/Wuqiyang312/dsh-git-workspace#readme",
+  "bugs": {
+    "url": "https://github.com/Wuqiyang312/dsh-git-workspace/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "cordis.patch.yml",
+    "README.md",
+    "LICENSE",
+    "src/*.js",
+    "locale/*.json",
+    "icon.svg"
+  ],
+  "scripts": {
+    "test": "node --test --experimental-test-isolation=none \"tests/*.test.js\"",
+    "check": "node --check index.js && node --check client.js && node --check src/parse.js && node --check src/clone.js"
+  },
+  "dsh": {
+    "bundle": { "patch": "./cordis.patch.yml" },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-locale",
+        "@deepseek-ai/dsh-client-ui-workspace"
+      ]
+    }
+  }
+}

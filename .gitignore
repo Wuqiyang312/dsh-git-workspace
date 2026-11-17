@@ -1,0 +1,24 @@
+# --- OS / editor noise -------------------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+*.swp
+
+# --- Node -------------------------------------------------------------------
+node_modules/
+npm-debug.log*
+pnpm-debug.log*
+yarn-error.log*
+
+# --- Local scratch ----------------------------------------------------------
+.scratch/
+*.local
+*.log
+
+# --- Secrets ----------------------------------------------------------------
+.env
+.env.*
+*.pem
+*.key

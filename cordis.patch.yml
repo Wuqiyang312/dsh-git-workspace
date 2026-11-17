@@ -1,0 +1,19 @@
+- insert:
+    - id: git-workspace
+      name: '@wuqiyang312/dsh-git-workspace'
+      config:
+        # Directory the repositories are cloned under. Empty means "next to the
+        # default workspace directory": <dirname(workingDirectory.defaultDirectory)>/repos
+        # (e.g. C:\Users\<you>\Documents\deepseek-harness\repos on Windows).
+        cloneRoot: ''
+        # The git executable. argv form only; never interpreted by a shell.
+        gitCommand: 'git'
+        # Wall clock limit for one clone; the process tree is killed on expiry.
+        timeoutMs: 600000
+        # Cap for the retained tail of git's stdout/stderr (and for error text).
+        maxOutputBytes: 65536
+        # Clone with --depth=depth unless the dialog's shallow switch says otherwise.
+        shallow: false
+        depth: 1
+        # Request body cap for POST /api/git-workspace/*.
+        maxBodyBytes: 65536
