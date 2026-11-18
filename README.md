@@ -11,7 +11,7 @@
 >
 > A DeepSeek Harness plugin: paste a Git address, get a cloned repository registered as a workspace with a fresh session in it.
 >
-> `npm i @wuqiyang312/dsh-git-workspace`
+> `npm i @wuqiyang312/dsh-git-workspace`（0.1.0 审核中，见「安装」）
 
 ---
 
@@ -32,6 +32,8 @@ DSH 的工作区需要先有一个本地目录。想拿一个 GitHub/GitLab 仓�
 ```bash
 npm i @wuqiyang312/dsh-git-workspace
 ```
+
+> **状态：0.1.0 已提交 npm 自动审核并进入 staged 状态，等发布者在 npmjs.com 上点一次 Approve（2FA）后才会变成可安装版本。** 在此之前 `npm i` 拿到的是 npm 的 `0.0.0-stage` 占位包，直接装会失败。审核通过后本节无需改动。
 
 装完把包名加进 profile 的 `dsh.profile.bundles`，DSH 启动时会读它自带的 `cordis.patch.yml`：
 
@@ -185,14 +187,24 @@ npm pack --dry-run    # 发布前看一眼清单
 
 ## 发布（维护者）
 
+npm 现在要求「2FA 或带 bypass 2FA 的 granular token」才能直接 `npm publish`，而 granular token **本身无法参与 2FA 流程**（对 `/‑/stage/<id>/approve` 只会 404，不会弹验证码）。所以本项目的发版走 **staged publishing**：命令行只负责把包送进暂存区，人在 npmjs.com 上点一次 Approve 完成 2FA。
+
 ```bash
-npm version patch|minor|major   # 改 package.json 与 tag
+# 1. 改版本 + 更新 CHANGELOG
+npm version patch|minor|major
 git push --follow-tags
-npm publish                     # 需要 @wuqiyang312 scope 的 package:write token
+
+# 2. 送进暂存区（任何 token 都行，不需要 2FA）
+npm stage publish --access public        # npm ≥ 11.15，Node ≥ 22.14
+
+# 3. 等人批准：npmjs.com → Settings → Staged Packages → Approve（2FA）
+npm stage list                           # 状态从 validating → staged → 已发布
+
+# 4. GitHub Release
 gh release create v<版本> --notes-file <(sed -n '/^## \[<版本>\]/,$p' CHANGELOG.md)
 ```
 
-`CHANGELOG.md` 是发布说明的来源，发版前先写它。
+首次 stage 一个**全新**包名时，npm 会先放一个 `0.0.0-stage` 占位版本，`latest` 也指向它——此时 `npm i <包名>` 会失败，直到批准后才正常。`CHANGELOG.md` 是发布说明的来源，发版前先写它。
 
 ## 许可
 
