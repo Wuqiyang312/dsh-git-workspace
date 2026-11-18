@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 First public release.
 
+### Distribution
+
+- GitHub: [Wuqiyang312/dsh-git-workspace](https://github.com/Wuqiyang312/dsh-git-workspace)，release `v0.1.0`
+- npm: [`@wuqiyang312/dsh-git-workspace@0.1.0`](https://www.npmjs.com/package/@wuqiyang312/dsh-git-workspace)（2026-11-19 发布）
+
 ### Added
 
 - **「添加 Git 工作区」按钮**：出现在新建会话那一行、工作区选择器右侧（`conversation.hero.options` slot，`order: 100`），点击打开对话框。

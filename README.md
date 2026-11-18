@@ -1,10 +1,17 @@
 # dsh-git-workspace
 
+[![npm version](https://img.shields.io/npm/v/@wuqiyang312/dsh-git-workspace?color=blue&label=npm)](https://www.npmjs.com/package/@wuqiyang312/dsh-git-workspace)
+[![npm downloads](https://img.shields.io/npm/dw/@wuqiyang312/dsh-git-workspace)](https://www.npmjs.com/package/@wuqiyang312/dsh-git-workspace)
+[![test](https://github.com/Wuqiyang312/dsh-git-workspace/actions/workflows/test.yml/badge.svg)](https://github.com/Wuqiyang312/dsh-git-workspace/actions/workflows/test.yml)
+[![license: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+
 **从 Git 地址直接开一个工作区。** 在 DeepSeek Harness 新建会话那一行，粘贴仓库地址，Host 端克隆到本地、登记为工作区，并自动切到该仓库的新会话。
 
 > DeepSeek Harness（DSH）插件 · Cordis bundle · MIT · 无 npm 运行时依赖
 >
 > A DeepSeek Harness plugin: paste a Git address, get a cloned repository registered as a workspace with a fresh session in it.
+>
+> `npm i @wuqiyang312/dsh-git-workspace`
 
 ---
 
@@ -20,22 +27,41 @@ DSH 的工作区需要先有一个本地目录。想拿一个 GitHub/GitLab 仓�
 
 ## 安装
 
-本插件是本地 Cordis bundle，用 DSH 的 `plugin_manager` 安装，`target` 传本仓库目录的绝对路径：
+### 从 npm（推荐）
 
+```bash
+npm i @wuqiyang312/dsh-git-workspace
 ```
-plugin_manager({ action: "install_bundle", target: "<...>/dsh-git-workspace" })
-```
 
-它会把这个包 link 进 profile、把 `cordis.patch.yml` 合并进 profile 的 patch 层。装完后**刷新页面**——Client half 会被 Renderer 缓存。
-
-手动装也可以，往 profile 的 `package.json` 加三项即可：
+装完把包名加进 profile 的 `dsh.profile.bundles`，DSH 启动时会读它自带的 `cordis.patch.yml`：
 
 ```jsonc
 {
   "dsh": { "profile": { "bundles": ["...", "@wuqiyang312/dsh-git-workspace"] } },
-  "dependencies": { "@wuqiyang312/dsh-git-workspace": "link:/absolute/path/to/dsh-git-workspace" }
+  "dependencies": { "@wuqiyang312/dsh-git-workspace": "^0.1.0" }
 }
 ```
+
+### 用 DSH 的 plugin_manager
+
+`plugin_manager` 的 `install_bundle` 既可以给 npm spec，也可以给本地目录：
+
+```
+plugin_manager({ action: "install_bundle", target: "@wuqiyang312/dsh-git-workspace" })
+plugin_manager({ action: "install_bundle", target: "/absolute/path/to/dsh-git-workspace" })
+```
+
+它会把包装进 profile、把 `cordis.patch.yml` 合并进 profile 的 patch 层。
+
+### 从源码（开发）
+
+```bash
+git clone https://github.com/Wuqiyang312/dsh-git-workspace.git
+```
+
+然后按上面的本地目录方式安装；profile 里会写成 `"link:/absolute/path"`，改源码即时生效。
+
+**装完都要刷新页面**——Client half 会被 Renderer 缓存，不刷新看不到按钮。
 
 ## 配置
 
@@ -148,6 +174,25 @@ npm run check     # 只做 node --check 语法检查
 测试**不联网、不碰用户仓库**：源仓库是在 `os.tmpdir()` 下用 `git init` + 一次提交现建的，克隆目标也在同一临时目录，测试结束自行清理。断言里比较文件内容时会把 CRLF 归一成 LF——克隆会继承机器的 `core.autocrlf`，GitHub 的 Windows runner 上是 `true`，这是 runner 的事、不是插件的事。
 
 CI 在 `.github/workflows/test.yml`：ubuntu + windows × Node 20 + 22，跑 `npm run check` 和 `npm test`。
+
+## npm 包里有什么
+
+`files` 只发布运行所需的东西：`index.js`、`client.js`、`src/*.js`、`cordis.patch.yml`、`locale/*.json`、`icon.svg`、`README.md`、`LICENSE`（约 40 KB tarball / 125 KB 解包，11 个文件）。`tests/`、`.github/`、`CHANGELOG.md` 留在仓库里不发布。
+
+```bash
+npm pack --dry-run    # 发布前看一眼清单
+```
+
+## 发布（维护者）
+
+```bash
+npm version patch|minor|major   # 改 package.json 与 tag
+git push --follow-tags
+npm publish                     # 需要 @wuqiyang312 scope 的 package:write token
+gh release create v<版本> --notes-file <(sed -n '/^## \[<版本>\]/,$p' CHANGELOG.md)
+```
+
+`CHANGELOG.md` 是发布说明的来源，发版前先写它。
 
 ## 许可
 
