@@ -11,7 +11,7 @@
 >
 > A DeepSeek Harness plugin: paste a Git address, get a cloned repository registered as a workspace with a fresh session in it.
 >
-> `npm i @wuqiyang312/dsh-git-workspace`
+> 在 DSH 的「插件 → 添加插件」里填 `@wuqiyang312/dsh-git-workspace` 即可安装；npm 名同名。
 
 ---
 
@@ -27,13 +27,34 @@ DSH 的工作区需要先有一个本地目录。想拿一个 GitHub/GitLab 仓�
 
 ## 安装
 
-### 从 npm（推荐）
+DSH 自带的插件管理器有图形界面，不用碰命令行。
 
-```bash
-npm i @wuqiyang312/dsh-git-workspace
+### 在界面里装（推荐）
+
+1. 打开左侧栏的**插件**页。
+2. 点右上角**添加插件**。
+3. 在包名框里填 `@wuqiyang312/dsh-git-workspace`（带版本可写 `@0.1.0`），按 Enter 或点**安装**。
+   - 同一个框也接受 **Git 地址**（`https://github.com/Wuqiyang312/dsh-git-workspace`）和**本地目录的绝对路径**，三种来源装出来是同一个插件。
+   - 网络慢可以展开**安装源**选「中国大陆镜像源」。
+4. 装完点**立即启用**——安装只把包放进 profile，**不点这一步插件是关着的**。
+5. **刷新页面**（Ctrl+R）让 Client half 重新加载。Host 半如果提示需要重启，再重启一次桌面应用。
+
+装好后回到「新建会话」，「选择工作区」右侧就会多出**添加 Git 工作区**。
+
+> 安装对话框会提示「插件在本机以你的权限运行，来源不明的插件可能损坏 DeepSeek Harness」。这个包是 MIT 开源的，代码就在本仓库，Host 半只做三件事：解析地址、`git clone`、登记工作区。
+
+### 用 `plugin_manager`（Agent / 脚本）
+
+`plugin_manager` 的 `install_bundle` 的 `target` 同样接受 npm spec 或本地目录：
+
+```
+plugin_manager({ action: "install_bundle", target: "@wuqiyang312/dsh-git-workspace" })
+plugin_manager({ action: "install_bundle", target: "/absolute/path/to/dsh-git-workspace" })
 ```
 
-装完把包名加进 profile 的 `dsh.profile.bundles`，DSH 启动时会读它自带的 `cordis.patch.yml`：
+装完仍要「启用」该 bundle（`set_bundle`），再刷新页面。
+
+### 手动改 profile（不用上面两种）
 
 ```jsonc
 {
@@ -42,16 +63,7 @@ npm i @wuqiyang312/dsh-git-workspace
 }
 ```
 
-### 用 DSH 的 plugin_manager
-
-`plugin_manager` 的 `install_bundle` 既可以给 npm spec，也可以给本地目录：
-
-```
-plugin_manager({ action: "install_bundle", target: "@wuqiyang312/dsh-git-workspace" })
-plugin_manager({ action: "install_bundle", target: "/absolute/path/to/dsh-git-workspace" })
-```
-
-它会把包装进 profile、把 `cordis.patch.yml` 合并进 profile 的 patch 层。
+DSH 启动时读包里的 `cordis.patch.yml`，把它插入 profile 的 patch 层。
 
 ### 从源码（开发）
 
@@ -59,9 +71,7 @@ plugin_manager({ action: "install_bundle", target: "/absolute/path/to/dsh-git-wo
 git clone https://github.com/Wuqiyang312/dsh-git-workspace.git
 ```
 
-然后按上面的本地目录方式安装；profile 里会写成 `"link:/absolute/path"`，改源码即时生效。
-
-**装完都要刷新页面**——Client half 会被 Renderer 缓存，不刷新看不到按钮。
+然后在「添加插件」里填这个目录的**绝对路径**（或在 profile 里写成 `"link:/absolute/path"`）；改源码即时生效，改完刷新页面。
 
 ## 配置
 
