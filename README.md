@@ -11,7 +11,7 @@
 >
 > A DeepSeek Harness plugin: paste a Git address, get a cloned repository registered as a workspace with a fresh session in it.
 >
-> `npm i @wuqiyang312/dsh-git-workspace`（0.1.0 审核中，见「安装」）
+> `npm i @wuqiyang312/dsh-git-workspace`
 
 ---
 
@@ -32,8 +32,6 @@ DSH 的工作区需要先有一个本地目录。想拿一个 GitHub/GitLab 仓�
 ```bash
 npm i @wuqiyang312/dsh-git-workspace
 ```
-
-> **状态：0.1.0 已提交 npm 自动审核并进入 staged 状态，等发布者在 npmjs.com 上点一次 Approve（2FA）后才会变成可安装版本。** 在此之前 `npm i` 拿到的是 npm 的 `0.0.0-stage` 占位包，直接装会失败。审核通过后本节无需改动。
 
 装完把包名加进 profile 的 `dsh.profile.bundles`，DSH 启动时会读它自带的 `cordis.patch.yml`：
 
